@@ -54,7 +54,7 @@ class MainPage extends StatelessWidget {
         child: ElevatedButton(
           child: Text('Push other page'),
           onPressed: () {
-            Navigator.of(context).push(
+            Navigator.of(context).push<MaterialPageRoute>(
               MaterialPageRoute(
                 builder: (context) {
                   return OtherPage();

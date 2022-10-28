@@ -708,7 +708,7 @@ class _CupertinoBackGestureDetectorState<T> extends State<_CupertinoBackGestureD
         PositionedDirectional(
           start: 0.0,
           width: dragAreaWidth,
-          top: 0.0,
+          top: BackGestureWidthTheme.getBackGestureAreaTop(context),
           bottom: 0.0,
           child: Listener(
             onPointerDown: _handlePointerDown,
