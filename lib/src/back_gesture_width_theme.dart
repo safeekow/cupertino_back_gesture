@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/widgets.dart';
 
 // from cupertino_page_route.dart
@@ -22,11 +24,14 @@ class BackGestureWidth {
 
 /// Applies a [backGestureWidth] to descendant widgets.
 class BackGestureWidthTheme extends InheritedWidget {
-  const BackGestureWidthTheme({
+  BackGestureWidthTheme({
     Key? key,
     required this.backGestureWidth,
     required Widget child,
-  }) : super(key: key, child: child);
+    double gestureAreaTop = 0,
+  }) : super(key: key, child: child) {
+    _gestureAreaTop = gestureAreaTop;
+  }
 
   final BackGestureWidthGetter backGestureWidth;
 
@@ -38,6 +43,24 @@ class BackGestureWidthTheme extends InheritedWidget {
         context.dependOnInheritedWidgetOfExactType<BackGestureWidthTheme>();
     return inheritedTheme?.backGestureWidth ?? _kDefaultTheme;
   }
+
+  static double getBackGestureAreaTop(BuildContext context) {
+    final inheritedTheme =
+        context.dependOnInheritedWidgetOfExactType<BackGestureWidthTheme>();
+    return inheritedTheme?.backGestureAreaTop ?? 0;
+  }
+
+  static void setBackGestureAreaTop(BuildContext context, double value) {
+    final inheritedTheme =
+    context.dependOnInheritedWidgetOfExactType<BackGestureWidthTheme>();
+    if (inheritedTheme != null) {
+      inheritedTheme.backGestureAreaTop = value;
+    }
+  }
+
+  double _gestureAreaTop = 0;
+  double get backGestureAreaTop => _gestureAreaTop;
+  set backGestureAreaTop(double value) => _gestureAreaTop = value;
 
   @override
   bool updateShouldNotify(BackGestureWidthTheme oldWidget) =>
