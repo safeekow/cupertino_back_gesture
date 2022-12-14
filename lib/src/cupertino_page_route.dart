@@ -6,6 +6,7 @@
 // allowing to change the width of area where back swipe gesture is accepted
 // through [BackGestureWidthTheme].
 
+import 'dart:io';
 import 'dart:math';
 import 'dart:ui' show lerpDouble, ImageFilter;
 
@@ -195,44 +196,30 @@ mixin CupertinoRouteTransitionMixin<T> on PageRoute<T> {
   static bool _isPopGestureEnabled<T>(PageRoute<T> route) {
     // If there's nothing to go back to, then obviously we don't support
     // the back gesture.
-    if (route.isFirst) {
-      print('non support. route.isFirst');
+    if (route.isFirst)
       return false;
-    }
     // If the route wouldn't actually pop if we popped it, then the gesture
     // would be really confusing (or would skip internal routes), so disallow it.
-    if (route.willHandlePopInternally) {
-      print('non support. route.willHandlePopInternally');
+    if (route.willHandlePopInternally)
       return false;
-    }
     // If attempts to dismiss this route might be vetoed such as in a page
     // with forms, then do not allow the user to dismiss the route with a swipe.
-    if (route.hasScopedWillPopCallback) {
-      print('non support. route.hasScopedWillPopCallback');
+    if (route.hasScopedWillPopCallback)
       return false;
-    }
     // Fullscreen dialogs aren't dismissible by back swipe.
-    if (route.fullscreenDialog) {
-      print('non support. route.fullscreenDialog');
+    if (route.fullscreenDialog)
       return false;
-    }
     // If we're in an animation already, we cannot be manually swiped.
-    if (route.animation!.status != AnimationStatus.completed) {
-      print('non support. in animation');
+    if (route.animation!.status != AnimationStatus.completed)
       return false;
-    }
     // If we're being popped into, we also cannot be swiped until the pop above
     // it completes. This translates to our secondary animation being
     // dismissed.
-    if (route.secondaryAnimation!.status != AnimationStatus.dismissed) {
-      print('non support. in popin');
+    if (route.secondaryAnimation!.status != AnimationStatus.dismissed)
       return false;
-    }
     // If we're in a gesture already, we cannot start another.
-    if (isPopGestureInProgress(route)) {
-      print('non support. already gesture');
+    if (isPopGestureInProgress(route))
       return false;
-    }
 
     // Looks like a back gesture would be welcome!
     return true;
@@ -660,21 +647,18 @@ class _CupertinoBackGestureDetectorState<T> extends State<_CupertinoBackGestureD
   }
 
   void _handleDragStart(DragStartDetails details) {
-    print('_handleDragStart');
     assert(mounted);
     assert(_backGestureController == null);
     _backGestureController = widget.onStartPopGesture();
   }
 
   void _handleDragUpdate(DragUpdateDetails details) {
-    print('_handleDragUpdate');
     assert(mounted);
     assert(_backGestureController != null);
     _backGestureController!.dragUpdate(_convertToLogical(details.primaryDelta! / context.size!.width));
   }
 
   void _handleDragEnd(DragEndDetails details) {
-    print('_handleDragEnd');
     assert(mounted);
     assert(_backGestureController != null);
     _backGestureController!.dragEnd(_convertToLogical(details.velocity.pixelsPerSecond.dx / context.size!.width));
@@ -724,7 +708,8 @@ class _CupertinoBackGestureDetectorState<T> extends State<_CupertinoBackGestureD
 
     Widget listener;
 
-    if (dragAreaWidth >= MediaQuery.of(context).size.width) {
+    Widget? stackChild;
+    if (dragAreaWidth >= MediaQuery.of(context).size.width && Platform.isIOS) {
       listener = Listener(
           onPointerDown: _handlePointerDown,
           behavior: HitTestBehavior.translucent,
@@ -734,12 +719,7 @@ class _CupertinoBackGestureDetectorState<T> extends State<_CupertinoBackGestureD
       listener = Listener(
         onPointerDown: _handlePointerDown,
         behavior: HitTestBehavior.translucent,
-        child: widget.child,
       );
-    }
-
-    Widget? stackChild;
-    if (dragAreaWidth < MediaQuery.of(context).size.width) {
       stackChild = widget.child;
     }
 
