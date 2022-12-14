@@ -6,6 +6,7 @@
 // allowing to change the width of area where back swipe gesture is accepted
 // through [BackGestureWidthTheme].
 
+import 'dart:io';
 import 'dart:math';
 import 'dart:ui' show lerpDouble, ImageFilter;
 
@@ -724,7 +725,8 @@ class _CupertinoBackGestureDetectorState<T> extends State<_CupertinoBackGestureD
 
     Widget listener;
 
-    if (dragAreaWidth >= MediaQuery.of(context).size.width) {
+    Widget? stackChild;
+    if (dragAreaWidth >= MediaQuery.of(context).size.width && Platform.isIOS) {
       listener = Listener(
           onPointerDown: _handlePointerDown,
           behavior: HitTestBehavior.translucent,
@@ -734,12 +736,7 @@ class _CupertinoBackGestureDetectorState<T> extends State<_CupertinoBackGestureD
       listener = Listener(
         onPointerDown: _handlePointerDown,
         behavior: HitTestBehavior.translucent,
-        child: widget.child,
       );
-    }
-
-    Widget? stackChild;
-    if (dragAreaWidth < MediaQuery.of(context).size.width) {
       stackChild = widget.child;
     }
 
