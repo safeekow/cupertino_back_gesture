@@ -660,18 +660,21 @@ class _CupertinoBackGestureDetectorState<T> extends State<_CupertinoBackGestureD
   }
 
   void _handleDragStart(DragStartDetails details) {
+    print('_handleDragStart');
     assert(mounted);
     assert(_backGestureController == null);
     _backGestureController = widget.onStartPopGesture();
   }
 
   void _handleDragUpdate(DragUpdateDetails details) {
+    print('_handleDragUpdate');
     assert(mounted);
     assert(_backGestureController != null);
     _backGestureController!.dragUpdate(_convertToLogical(details.primaryDelta! / context.size!.width));
   }
 
   void _handleDragEnd(DragEndDetails details) {
+    print('_handleDragEnd');
     assert(mounted);
     assert(_backGestureController != null);
     _backGestureController!.dragEnd(_convertToLogical(details.velocity.pixelsPerSecond.dx / context.size!.width));
@@ -715,19 +718,41 @@ class _CupertinoBackGestureDetectorState<T> extends State<_CupertinoBackGestureD
                            MediaQuery.of(context).padding.left :
                            MediaQuery.of(context).padding.right;
     dragAreaWidth = max(dragAreaWidth, _backGestureWidth);
+
+    print('screenWidth: ${MediaQuery.of(context).size.width}, dragAreaWidth: $dragAreaWidth, _backGestureWidth: $_backGestureWidth');
+
+
+    Widget listener;
+
+    if (dragAreaWidth >= MediaQuery.of(context).size.width) {
+      listener = Listener(
+          onPointerDown: _handlePointerDown,
+          behavior: HitTestBehavior.translucent,
+          child: widget.child,
+      );
+    } else {
+      listener = Listener(
+        onPointerDown: _handlePointerDown,
+        behavior: HitTestBehavior.translucent,
+        child: widget.child,
+      );
+    }
+
+    Widget? stackChild;
+    if (dragAreaWidth < MediaQuery.of(context).size.width) {
+      stackChild = widget.child;
+    }
+
     return Stack(
       fit: StackFit.passthrough,
       children: <Widget>[
-        widget.child,
+        if (stackChild != null) stackChild,
         PositionedDirectional(
           start: 0.0,
           width: dragAreaWidth,
           top: BackGestureWidthTheme.getBackGestureAreaTop(context),
           bottom: 0.0,
-          child: Listener(
-            onPointerDown: _handlePointerDown,
-            behavior: HitTestBehavior.translucent,
-          ),
+          child: listener,
         ),
       ],
     );
