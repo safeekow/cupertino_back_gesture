@@ -709,7 +709,7 @@ class _CupertinoBackGestureDetectorState<T> extends State<_CupertinoBackGestureD
     Widget listener;
 
     Widget? stackChild;
-    if (dragAreaWidth >= MediaQuery.of(context).size.width && Platform.isIOS) {
+    if (dragAreaWidth >= MediaQuery.of(context).size.width) {
       listener = Listener(
           onPointerDown: _handlePointerDown,
           behavior: HitTestBehavior.translucent,
