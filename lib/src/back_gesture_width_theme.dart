@@ -1,5 +1,7 @@
 // ignore_for_file: must_be_immutable
 
+import 'dart:math';
+
 import 'package:flutter/widgets.dart';
 
 // from cupertino_page_route.dart
@@ -26,14 +28,17 @@ class BackGestureWidth {
 class BackGestureWidthTheme extends InheritedWidget {
   BackGestureWidthTheme({
     Key? key,
-    required this.backGestureWidth,
+    required BackGestureWidthGetter backGestureWidth,
     required Widget child,
     double gestureAreaTop = 0,
   }) : super(key: key, child: child) {
+    _backGestureWidth = backGestureWidth;
     _gestureAreaTop = gestureAreaTop;
   }
 
-  final BackGestureWidthGetter backGestureWidth;
+  BackGestureWidthGetter? _backGestureWidth;
+  BackGestureWidthGetter get backGestureWidth =>
+      _backGestureWidth ?? _kDefaultTheme;
 
   static final BackGestureWidthGetter _kDefaultTheme =
       BackGestureWidth.fixed(_kDefaultBackGestureWidth);
@@ -41,7 +46,23 @@ class BackGestureWidthTheme extends InheritedWidget {
   static BackGestureWidthGetter of(BuildContext context) {
     final inheritedTheme =
         context.dependOnInheritedWidgetOfExactType<BackGestureWidthTheme>();
-    return inheritedTheme?.backGestureWidth ?? _kDefaultTheme;
+    return inheritedTheme?._backGestureWidth ?? _kDefaultTheme;
+  }
+
+  static void setBackGestureWidth(
+      BuildContext context, BackGestureWidthGetter value) {
+    final inheritedTheme =
+        context.dependOnInheritedWidgetOfExactType<BackGestureWidthTheme>();
+    if (inheritedTheme != null) {
+      inheritedTheme._backGestureWidth = value;
+    }
+  }
+
+  static double getBackGestureDragAreaWidth(BuildContext context) {
+    double dragAreaWidth = Directionality.of(context) == TextDirection.ltr
+        ? MediaQuery.of(context).padding.left
+        : MediaQuery.of(context).padding.right;
+    return max(dragAreaWidth, of(context)(() => MediaQuery.of(context).size));
   }
 
   static double getBackGestureAreaTop(BuildContext context) {
@@ -52,7 +73,7 @@ class BackGestureWidthTheme extends InheritedWidget {
 
   static void setBackGestureAreaTop(BuildContext context, double value) {
     final inheritedTheme =
-    context.dependOnInheritedWidgetOfExactType<BackGestureWidthTheme>();
+        context.dependOnInheritedWidgetOfExactType<BackGestureWidthTheme>();
     if (inheritedTheme != null) {
       inheritedTheme.backGestureAreaTop = value;
     }
@@ -64,5 +85,5 @@ class BackGestureWidthTheme extends InheritedWidget {
 
   @override
   bool updateShouldNotify(BackGestureWidthTheme oldWidget) =>
-      backGestureWidth != oldWidget.backGestureWidth;
+      _backGestureWidth != oldWidget._backGestureWidth;
 }
